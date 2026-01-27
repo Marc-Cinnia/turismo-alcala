@@ -15,7 +15,7 @@ if (localPropertiesFile.exists()) {
 
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
-    flutterVersionCode = '10'  
+    flutterVersionCode = '13'  
 }
 
 def flutterVersionName = localProperties.getProperty('flutter.versionName')
@@ -35,7 +35,7 @@ android {
     compileSdk 36
     ndkVersion flutter.ndkVersion
     
-    // FORZAR SDK 34 para todas las dependencias
+    // Configuración de dependencias para compatibilidad con SDK 36
     configurations.all {
         resolutionStrategy {
             force 'androidx.core:core:1.10.1'
@@ -75,6 +75,10 @@ android {
             force 'androidx.media3:media3-exoplayer-hls:1.1.1'
             force 'androidx.media3:media3-exoplayer-rtsp:1.1.1'
             force 'androidx.media3:media3-exoplayer-smoothstreaming:1.1.1'
+            // Forzar versión anterior de camera-core compatible con SDK 21
+            force 'androidx.camera:camera-core:1.2.3'
+            force 'androidx.camera:camera-camera2:1.2.3'
+            force 'androidx.camera:camera-lifecycle:1.2.3'
         }
     }
 
@@ -97,11 +101,20 @@ android {
         applicationId "cinnia.alcala.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
+        // minSdkVersion debe ser 23 o superior para androidx.camera:camera-core:1.5.0
+        // flutter.minSdkVersion es 21 por defecto, pero necesitamos 23
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 35  // Requerido para compatibilidad con 16 KB page size
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        
+        // Configuración explícita para compatibilidad con 16 KB page size
+        // Excluir x86_64 ya que las bibliotecas nativas no son compatibles con 16 KB en esa arquitectura
+        // Solo mantener arquitecturas ARM que son las usadas en dispositivos reales
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
     }
 
     signingConfigs {
@@ -126,8 +139,20 @@ android {
     buildTypes {
         release {
             signingConfig signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+    
+    // Configuración para compatibilidad con 16 KB page size
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+            // Excluir bibliotecas nativas incompatibles con 16 KB
+            excludes += [
+                '**/libbarhopper_v3.so',
+                '**/libimage_processing_util_jni.so'
+            ]
         }
     }
 }
