@@ -46,6 +46,8 @@
 	<string>Esta aplicación necesita acceso a Bluetooth para detectar beacons iBeacon colocados en lugares turísticos de Alcalá de Henares. Esto nos permite ofrecerte información contextual automáticamente cuando te acerques a puntos de interés como museos, restaurantes y lugares históricos.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>Esta aplicación necesita acceso a Bluetooth para detectar beacons iBeacon colocados en lugares turísticos de Alcalá de Henares. Esto nos permite ofrecerte información contextual automáticamente cuando te acerques a puntos de interés como museos, restaurantes y lugares históricos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Esta aplicación necesita acceso a la cámara para escanear códigos QR ubicados en lugares turísticos de Alcalá de Henares. Al escanear estos códigos, recibirás información detallada sobre museos, monumentos históricos, restaurantes y eventos locales, mejorando tu experiencia turística en la ciudad.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Esta aplicación necesita acceso continuo a tu ubicación para detectar automáticamente beacons iBeacon colocados en lugares turísticos de Alcalá de Henares, incluso cuando la app está en segundo plano. Ejemplo: cuando te acerques al Castillo de la Coracera, recibirás automáticamente información histórica y horarios de visita. La localización también se usa para mostrar rutas turísticas y puntos de interés cercanos en el mapa.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
