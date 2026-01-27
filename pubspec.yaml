@@ -54,7 +54,6 @@ dependencies:
   # Beacon
   flutter_background_service:
   beacon_scanner:
-  flutter_beacon: ^0.5.1
   google_fonts: ^6.2.1
   provider: ^6.1.2
   flutter_map: ^8.0.0
