@@ -107,8 +107,13 @@ class BeaconService {
           print('Permisos de ubicación denegados o restringidos');
           return;
         }
+        // Inicializar sin esperar el resultado ya que puede devolver null en iOS
+        _beaconScanner.initialize(true).catchError((error) {
+          print('⚠️ Error al inicializar beacon scanner (puede ser ignorado): $error');
+        });
+      } else {
+        await _beaconScanner.initialize(true);
       }
-      await _beaconScanner.initialize(true);
     } catch (e) {
       print('Error initializing beacon scanner: $e');
     }
@@ -283,7 +288,12 @@ class BeaconService {
         print('Permisos de ubicación denegados o restringidos en iOS');
         return;
       }
-      await _beaconScanner.initialize(true);
+      // Inicializar sin esperar el resultado ya que puede devolver null en iOS
+      _beaconScanner.initialize(true).then((_) {
+        print('✅ Beacon scanner inicializado correctamente');
+      }).catchError((error) {
+        print('⚠️ Error al inicializar beacon scanner (puede ser ignorado): $error');
+      });
     } catch (e) {
       print('Error initializing iOS beacon scanner: $e');
     }
