@@ -23,6 +23,9 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0.0'  
 }
 
+
+def enforcedMinSdkVersion = 23
+
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -101,17 +104,12 @@ android {
         applicationId "cinnia.alcala.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        // minSdkVersion debe ser 23 o superior para androidx.camera:camera-core:1.5.0
-        // flutter.minSdkVersion es 21 por defecto, pero necesitamos 23
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion enforcedMinSdkVersion
         targetSdkVersion 35  // Requerido para compatibilidad con 16 KB page size
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
         
-        // Configuración explícita para compatibilidad con 16 KB page size
-        // Excluir x86_64 ya que las bibliotecas nativas no son compatibles con 16 KB en esa arquitectura
-        // Solo mantener arquitecturas ARM que son las usadas en dispositivos reales
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
