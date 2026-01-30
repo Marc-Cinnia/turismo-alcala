@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:valdeiglesias/constants/app_constants.dart';
 import 'package:valdeiglesias/models/language_model.dart';
 import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io';
 
 class SmartQR extends StatefulWidget {
   const SmartQR({Key? key}) : super(key: key);
@@ -13,145 +15,209 @@ class SmartQR extends StatefulWidget {
 }
 
 class _SmartQRState extends State<SmartQR> {
-  MobileScannerController? _scannerController;
-  bool _isScanning = false;
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? _controller;
   String? _lastScannedCode;
   DateTime? _lastScanTime;
+  bool _hasPermission = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeScanner();
+    _checkPermissions();
   }
 
-  void _initializeScanner() {
+  Future<void> _checkPermissions() async {
     try {
-      _scannerController = MobileScannerController(
-        detectionSpeed: DetectionSpeed.normal,
-        facing: CameraFacing.back,
-        torchEnabled: false,
-      );
-      print('📷 Mobile Scanner inicializado correctamente');
+      final status = await Permission.camera.status;
+      if (status.isGranted) {
+        setState(() {
+          _hasPermission = true;
+        });
+      } else if (status.isDenied) {
+        final result = await Permission.camera.request();
+        if (result.isGranted) {
+          setState(() {
+            _hasPermission = true;
+          });
+        } else {
+          setState(() {
+            _hasPermission = false;
+          });
+        }
+      } else {
+        setState(() {
+          _hasPermission = false;
+        });
+      }
     } catch (e) {
-      print('❌ Error inicializando Mobile Scanner: $e');
+      print('❌ Error verificando permisos de cámara: $e');
+      setState(() {
+        _hasPermission = false;
+      });
     }
   }
 
   @override
+  void reassemble() {
+    super.reassemble();
+    if (Platform.isAndroid) {
+      _controller?.pauseCamera();
+    }
+    _controller?.resumeCamera();
+  }
+
+  @override
   void dispose() {
-    _scannerController?.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
-  void _toggleScanner() {
+  void _onQRViewCreated(QRViewController controller) {
     setState(() {
-      _isScanning = !_isScanning;
+      _controller = controller;
     });
-    
-    if (_isScanning) {
-      print('📷 Iniciando escáner...');
-      _restartScanner();
-    } else {
-      print('⏸️ Deteniendo escáner...');
-    }
+    controller.scannedDataStream.listen((scanData) {
+      if (!mounted) return;
+      
+      try {
+        final String? code = scanData.code;
+        if (code != null && code.isNotEmpty) {
+          final DateTime now = DateTime.now();
+          
+          // Evitar detecciones duplicadas (solo 1 segundo de cooldown)
+          if (_lastScannedCode == code && 
+              _lastScanTime != null && 
+              now.difference(_lastScanTime!).inSeconds < 1) {
+            return;
+          }
+          
+          _lastScannedCode = code;
+          _lastScanTime = now;
+          
+          print('📱 QR detectado: $code');
+          
+          // Pausar el escáner mientras se muestra el diálogo
+          _controller?.pauseCamera();
+          
+          // Mostrar el diálogo
+          _showQRCodeDialog(code);
+        }
+      } catch (e) {
+        print('❌ Error procesando código QR: $e');
+      }
+    });
   }
 
-  void _restartScanner() {
-    print('🔄 Reiniciando escáner...');
+  void _showPermissionDialog() {
+    if (!mounted) return;
     
-    // Limpiar el último código escaneado para permitir re-escaneo
-    _lastScannedCode = null;
-    _lastScanTime = null;
-    
-    // Disposar el controlador actual
-    _scannerController?.dispose();
-    
-    // Crear un nuevo controlador
-    try {
-      _scannerController = MobileScannerController(
-        detectionSpeed: DetectionSpeed.normal,
-        facing: CameraFacing.back,
-        torchEnabled: false,
-      );
-      print('✅ Nuevo controlador de escáner creado');
-    } catch (e) {
-      print('❌ Error creando nuevo controlador: $e');
-    }
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Permiso de cámara requerido'),
+        content: Text('Esta aplicación necesita acceso a la cámara para escanear códigos QR. Por favor, otorga el permiso en la configuración de la aplicación.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              openAppSettings();
+            },
+            child: Text('Abrir configuración'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showQRCodeDialog(String code) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        final language = Provider.of<LanguageModel>(context, listen: false);
-        return AlertDialog(
-          title: Text(
-            language.english ? 'QR Code Detected' : 'Código QR Detectado',
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                language.english ? 'Content:' : 'Contenido:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppConstants.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppConstants.primary.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: SelectableText(
-                  code,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppConstants.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Reiniciar el escáner para permitir nueva detección
-                _restartScanner();
-              },
-              child: Text(language.english ? 'Close' : 'Cerrar'),
+    if (!mounted) return;
+    
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          final language = Provider.of<LanguageModel>(context, listen: false);
+          return AlertDialog(
+            title: Text(
+              language.english ? 'QR Code Detected' : 'Código QR Detectado',
             ),
-            if (_isUrl(code))
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  language.english ? 'Content:' : 'Contenido:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppConstants.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: AppConstants.primary.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: SelectableText(
+                    code,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppConstants.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  // Reanudar el escáner
+                  _controller?.resumeCamera();
+                },
+                child: Text(language.english ? 'Close' : 'Cerrar'),
+              ),
+              if (_isUrl(code))
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _launchUrl(code);
+                    // Reanudar el escáner
+                    _controller?.resumeCamera();
+                  },
+                  child: Text(language.english ? 'Open Link' : 'Abrir Enlace'),
+                ),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  _launchUrl(code);
+                  // Limpiar historial y continuar escaneando
+                  _lastScannedCode = null;
+                  _lastScanTime = null;
+                  _controller?.resumeCamera();
+                  print('🔄 Historial limpiado, continuando escaneo...');
                 },
-                child: Text(language.english ? 'Open Link' : 'Abrir Enlace'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppConstants.contrastSoft,
+                ),
+                child: Text(language.english ? 'Scan Again' : 'Escanear de Nuevo'),
               ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                // Limpiar historial y continuar escaneando (sin reiniciar el escáner)
-                _lastScannedCode = null;
-                _lastScanTime = null;
-                print('🔄 Historial limpiado, continuando escaneo...');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppConstants.contrastSoft,
-              ),
-              child: Text(language.english ? 'Scan Again' : 'Escanear de Nuevo'),
-            ),
-          ],
-        );
-      },
-    );
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print('❌ Error mostrando diálogo QR: $e');
+      // Reanudar el escáner en caso de error
+      _controller?.resumeCamera();
+    }
   }
 
   bool _isUrl(String text) {
@@ -312,40 +378,12 @@ class _SmartQRState extends State<SmartQR> {
           
           SizedBox(height: 15),
           
-          // Botón para activar/desactivar escáner
-              Semantics(
-                label: _isScanning
-                  ? (language.english ? 'Stop QR Scanner button' : 'Botón para detener el escáner QR')
-                  : (language.english ? 'Start QR Scanner button' : 'Botón para iniciar el escáner QR'),
-                button: true,
-                child: ElevatedButton.icon(
-                  onPressed: _toggleScanner,
-                  icon: Icon(_isScanning ? Icons.stop : Icons.qr_code_scanner, size: 20),
-                  label: Text(
-                    _isScanning
-                      ? (language.english ? 'Stop Scanner' : 'Detener Escáner')
-                      : (language.english ? 'Start Scanner' : 'Iniciar Escáner'),
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isScanning ? Colors.red : AppConstants.primary,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    elevation: 2,
-                  ),
-                ),
-              ),
-          
-          SizedBox(height: 8),
-          
           // Área del escáner QR
           Expanded(
             child: Semantics(
-              label: _isScanning 
+              label: _hasPermission
                 ? (language.english ? 'QR Code scanner camera view. Point camera at QR code to scan' : 'Vista de cámara del escáner QR. Apunta la cámara a un código QR para escanear')
-                : (language.english ? 'QR Code scanner area. Press start button to begin scanning' : 'Área del escáner QR. Presiona el botón iniciar para comenzar a escanear'),
+                : (language.english ? 'QR Code scanner area. Camera permission required' : 'Área del escáner QR. Se requiere permiso de cámara'),
               child: Container(
                 margin: EdgeInsets.fromLTRB(20, 5, 20, 10),
                 decoration: BoxDecoration(
@@ -357,33 +395,17 @@ class _SmartQRState extends State<SmartQR> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(18),
-                  child: _isScanning && _scannerController != null
-                      ? MobileScanner(
-                          controller: _scannerController!,
-                          onDetect: (capture) {
-                            final List<Barcode> barcodes = capture.barcodes;
-                            for (final barcode in barcodes) {
-                              if (barcode.rawValue != null) {
-                                final String code = barcode.rawValue!;
-                                final DateTime now = DateTime.now();
-                                
-                                // Evitar detecciones duplicadas (solo 1 segundo de cooldown)
-                                if (_lastScannedCode == code && 
-                                    _lastScanTime != null && 
-                                    now.difference(_lastScanTime!).inSeconds < 1) {
-                                  return;
-                                }
-                                
-                                _lastScannedCode = code;
-                                _lastScanTime = now;
-                                
-                                print('📱 QR detectado: $code');
-                                _showQRCodeDialog(code);
-                                // NO detener el escáner automáticamente
-                                break;
-                              }
-                            }
-                          },
+                  child: _hasPermission
+                      ? QRView(
+                          key: qrKey,
+                          onQRViewCreated: _onQRViewCreated,
+                          overlay: QrScannerOverlayShape(
+                            borderColor: AppConstants.primary,
+                            borderRadius: 10,
+                            borderLength: 30,
+                            borderWidth: 10,
+                            cutOutSize: 250,
+                          ),
                         )
                       : Container(
                           width: double.infinity,
@@ -397,20 +419,30 @@ class _SmartQRState extends State<SmartQR> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(
-                                  Icons.qr_code_scanner,
+                                  Icons.camera_alt_outlined,
                                   size: 80,
                                   color: Colors.grey[400],
                                 ),
                                 SizedBox(height: 16),
                                 Text(
-                                  language.english 
-                                    ? 'Press "Start Scanner" to begin'
-                                    : 'Presiona "Iniciar Escáner" para comenzar',
+                                  language.english
+                                      ? 'Camera permission required'
+                                      : 'Se requiere permiso de cámara',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.grey[600],
                                   ),
+                                ),
+                                SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    _checkPermissions();
+                                    if (!_hasPermission) {
+                                      _showPermissionDialog();
+                                    }
+                                  },
+                                  child: Text(language.english ? 'Grant Permission' : 'Otorgar Permiso'),
                                 ),
                               ],
                             ),
