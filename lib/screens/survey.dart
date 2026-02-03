@@ -936,70 +936,122 @@ class _SurveyState extends State<Survey> {
 
   void _submitSurvey(BuildContext context) async {
     print('🔄 [SURVEY] Iniciando envío de encuesta...');
-    final resultMsg = await context.read<SurveyModel>().submitSurvey();
-    print('🔄 [SURVEY] Resultado: $resultMsg');
-
-    if (resultMsg != null) {
-      print('✅ [SURVEY] Mostrando diálogo de éxito');
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          final titleText = (language.english)
-              ? AppConstants.surveyTitleDialogEn
-              : AppConstants.surveyTitleDialog;
-          final descriptionText = (language.english)
-              ? AppConstants.surveyDescriptionDialogEn
-              : AppConstants.surveyDescriptionDialog;
-
-          return AlertDialog(
-            title: Text(titleText),
-            content: Text(
-              descriptionText,
-              textAlign: TextAlign.justify,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppConstants.primary,
-                  ),
-            ),
-            actions: [
-              ElevatedButton.icon(
-                onPressed: () async {
-                  await context.read<SurveyModel>().setSurveyAnswered(true);
-                  Navigator.of(context).pop();
-                },
-                icon: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                ),
-                label: Text(
+    
+    // Mostrar diálogo de carga
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(
                   (language.english)
-                      ? AppConstants.acceptEn
-                      : AppConstants.accept,
-                  style: GoogleFonts.dmSans().copyWith(
-                    color: Colors.white,
-                    fontSize: 15.0,
-                    fontWeight: FontWeight.w500,
-                  ),
+                      ? 'Sending survey...'
+                      : 'Enviando encuesta...',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all<Color>(
-                    AppConstants.contrast,
-                  ),
-                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      final resultMsg = await context.read<SurveyModel>().submitSurvey();
+      print('🔄 [SURVEY] Resultado: $resultMsg');
+
+      // Cerrar diálogo de carga
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+
+      if (resultMsg != null) {
+        print('✅ [SURVEY] Mostrando diálogo de éxito');
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) {
+            final titleText = (language.english)
+                ? AppConstants.surveyTitleDialogEn
+                : AppConstants.surveyTitleDialog;
+            final descriptionText = (language.english)
+                ? AppConstants.surveyDescriptionDialogEn
+                : AppConstants.surveyDescriptionDialog;
+
+            return AlertDialog(
+              title: Text(titleText),
+              content: Text(
+                descriptionText,
+                textAlign: TextAlign.justify,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppConstants.primary,
+                    ),
               ),
-            ],
-          );
-        },
-      ).then((_) => Navigator.of(context).popUntil((route) => route.isFirst));
-    } else {
-      print('❌ [SURVEY] No se recibió respuesta del servidor');
-      // Mostrar mensaje de error si no hay resultado
+              actions: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await context.read<SurveyModel>().setSurveyAnswered(true);
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(
+                    Icons.check,
+                    color: Colors.white,
+                  ),
+                  label: Text(
+                    (language.english)
+                        ? AppConstants.acceptEn
+                        : AppConstants.accept,
+                    style: GoogleFonts.dmSans().copyWith(
+                      color: Colors.white,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStateProperty.all<Color>(
+                      AppConstants.contrast,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ).then((_) => Navigator.of(context).popUntil((route) => route.isFirst));
+      } else {
+        print('❌ [SURVEY] No se recibió respuesta del servidor');
+        // Mostrar mensaje de error si no hay resultado
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              (language.english)
+                  ? 'Error submitting survey. Please try again.'
+                  : 'Error al enviar la encuesta. Por favor, inténtalo de nuevo.',
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      }
+    } catch (e) {
+      print('❌ [SURVEY] Excepción en _submitSurvey: $e');
+      // Cerrar diálogo de carga si aún está abierto
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+      // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             (language.english)
-                ? 'Error submitting survey. Please try again.'
-                : 'Error al enviar la encuesta. Por favor, inténtalo de nuevo.',
+                ? 'Error submitting survey. Please check your connection and try again.'
+                : 'Error al enviar la encuesta. Por favor, verifica tu conexión e inténtalo de nuevo.',
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 4),

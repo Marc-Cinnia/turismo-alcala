@@ -450,21 +450,27 @@ class SurveyModel extends ChangeNotifier {
     print('📤 [SURVEY] Datos: $jsonRequest');
     
     try {
-    final response = await http.post(
-      Uri.parse(AppConstants.surveyUrl),
-      headers: AppConstants.requestHeaders,
-      body: jsonRequest,
-    );
+      final response = await http.post(
+        Uri.parse(AppConstants.surveyUrl),
+        headers: AppConstants.requestHeaders,
+        body: jsonRequest,
+      ).timeout(
+        const Duration(seconds: 30),
+        onTimeout: () {
+          print('⏱️ [SURVEY] Timeout al enviar la encuesta');
+          throw Exception('Timeout: La petición tardó demasiado tiempo');
+        },
+      );
 
       print('📥 [SURVEY] Respuesta del servidor: ${response.statusCode}');
       print('📥 [SURVEY] Cuerpo de respuesta: ${response.body}');
 
-    if (response.statusCode == AppConstants.created) {
-      result = {
-        AppConstants.surveyResultKey: AppConstants.surveySubmitted,
-        AppConstants.surveyResultEnKey: AppConstants.surveySubmittedEn,
-      };
-      setSurveyAnswered(true);
+      if (response.statusCode == AppConstants.created) {
+        result = {
+          AppConstants.surveyResultKey: AppConstants.surveySubmitted,
+          AppConstants.surveyResultEnKey: AppConstants.surveySubmittedEn,
+        };
+        setSurveyAnswered(true);
         print('✅ [SURVEY] Encuesta enviada con éxito');
       } else {
         print('❌ [SURVEY] Error: Status code ${response.statusCode}');
@@ -472,6 +478,8 @@ class SurveyModel extends ChangeNotifier {
       }
     } catch (e) {
       print('❌ [SURVEY] Excepción al enviar: $e');
+      // Re-lanzar la excepción para que pueda ser manejada en la UI
+      rethrow;
     }
 
     return result;

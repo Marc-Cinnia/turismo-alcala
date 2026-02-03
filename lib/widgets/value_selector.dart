@@ -26,6 +26,7 @@ class ValueSelector extends StatefulWidget {
 
 class _ValueSelectorState extends State<ValueSelector> {
   final fontWeight = FontWeight.w300;
+  final FocusNode _focusNode = FocusNode();
 
   late List<DropdownMenuEntry> entries;
   late TextStyle labelStyle;
@@ -43,6 +44,12 @@ class _ValueSelectorState extends State<ValueSelector> {
     );
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -91,6 +98,7 @@ class _ValueSelectorState extends State<ValueSelector> {
         width: double.infinity,
         enabled: widget.enabled,
         controller: widget.controller,
+        focusNode: _focusNode,
         dropdownMenuEntries: entries,
         hintText: hintText,
         inputDecorationTheme: InputDecorationTheme(
@@ -122,7 +130,18 @@ class _ValueSelectorState extends State<ValueSelector> {
             },
           ),
         ),
-        onSelected: (selection) => _handleSurveySelection(selection),
+        onSelected: (selection) {
+          if (selection != null) {
+            // Actualizar el controller para cerrar el menú correctamente
+            widget.controller.text = selection.valueDescription;
+            // Perder el foco para cerrar el menú
+            _focusNode.unfocus();
+            // Pequeño delay para asegurar que el menú se cierre antes de actualizar el estado
+            Future.microtask(() {
+              _handleSurveySelection(selection);
+            });
+          }
+        },
       ),
     );
   }
