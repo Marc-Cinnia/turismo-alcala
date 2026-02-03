@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 
-def enforcedMinSdkVersion = 23
+def enforcedMinSdkVersion = 24
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
