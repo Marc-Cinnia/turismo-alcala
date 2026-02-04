@@ -26,9 +26,6 @@ class ValueSelector extends StatefulWidget {
 
 class _ValueSelectorState extends State<ValueSelector> {
   final fontWeight = FontWeight.w300;
-  // Evita que el DropdownMenu (que usa internamente un TextField) pida foco y
-  // muestre el teclado: en encuestas no se puede escribir.
-  final FocusNode _focusNode = FocusNode(canRequestFocus: false);
 
   late List<DropdownMenuEntry> entries;
   late TextStyle labelStyle;
@@ -46,12 +43,6 @@ class _ValueSelectorState extends State<ValueSelector> {
     );
 
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -100,10 +91,6 @@ class _ValueSelectorState extends State<ValueSelector> {
         width: double.infinity,
         enabled: widget.enabled,
         controller: widget.controller,
-        focusNode: _focusNode,
-        requestFocusOnTap: false,
-        enableSearch: false,
-        enableFilter: false,
         dropdownMenuEntries: entries,
         hintText: hintText,
         inputDecorationTheme: InputDecorationTheme(
@@ -135,19 +122,7 @@ class _ValueSelectorState extends State<ValueSelector> {
             },
           ),
         ),
-        onSelected: (selection) {
-          if (selection != null) {
-            // Actualizar el controller para cerrar el menú correctamente
-            widget.controller.text = selection.valueDescription;
-            // Perder el foco para cerrar el menú
-            _focusNode.unfocus();
-            FocusManager.instance.primaryFocus?.unfocus();
-            // Pequeño delay para asegurar que el menú se cierre antes de actualizar el estado
-            Future.microtask(() {
-              _handleSurveySelection(selection);
-            });
-          }
-        },
+        onSelected: (selection) => _handleSurveySelection(selection),
       ),
     );
   }
@@ -255,15 +230,14 @@ class _ValueSelectorState extends State<ValueSelector> {
 
     if (showCountries) {
       context.read<SurveyModel>().showCountries = showCountries;
-      context.read<SurveyModel>().showResidentData = false;
     } else {
       context.read<SurveyModel>().userCountry = AppConstants.spain;
       context.read<SurveyModel>().userAutonomousCommunity = AppConstants.madrid;
       context.read<SurveyModel>().showResidentData = true;
-      context.read<SurveyModel>().showCountries = false;
     }
 
     context.read<SurveyModel>().setUserResident(resident);
+    context.read<SurveyModel>().residentEnabled = false;
   }
 
   void _handleCountrySelection(SurveyValue selection) {
@@ -292,6 +266,8 @@ class _ValueSelectorState extends State<ValueSelector> {
       context.read<SurveyModel>().showArrivalTransport = true;
       context.read<SurveyModel>().showTravelWith = true;
     }
+
+    context.read<SurveyModel>().countryEnabled = false;
   }
 
   void _handleTravelWithSelection(SurveyValue selection) {
@@ -354,6 +330,7 @@ class _ValueSelectorState extends State<ValueSelector> {
     context.read<SurveyModel>().showPlannedStay = true;
     context.read<SurveyModel>().showVisitReason = true;
     context.read<SurveyModel>().showVisitFeatures = true;
+    context.read<SurveyModel>().transportEnabled = false;
   }
 
   void _handleCommunitySelection(SurveyValue selection) {
@@ -361,6 +338,7 @@ class _ValueSelectorState extends State<ValueSelector> {
         selection.valueDescription;
     context.read<SurveyModel>().showArrivalTransport = true;
     context.read<SurveyModel>().showTravelWith = true;
+    context.read<SurveyModel>().communitiesEnabled = false;
   }
 
   void _handleKnowPlacesVisitSelection(SurveyValue selection) {
@@ -383,6 +361,7 @@ class _ValueSelectorState extends State<ValueSelector> {
 
     context.read<SurveyModel>().setUserStaySMV(userStayInSMV);
     context.read<SurveyModel>().showAccomodationType = showAccommodationField;
+    context.read<SurveyModel>().stayInSMVEnabled = false;
   }
 
   void _handleAccommodationTypeSelection(SurveyValue selection) {
@@ -417,6 +396,7 @@ class _ValueSelectorState extends State<ValueSelector> {
 
     context.read<SurveyModel>().setUserFirstVisit(isUserFirstVisit);
     context.read<SurveyModel>().showHowKnown = showHowKnownField;
+    context.read<SurveyModel>().firstVisitEnabled = false;
   }
 
   void _handleHowKnownSelection(SurveyValue selection) {
@@ -438,7 +418,6 @@ class _ValueSelectorState extends State<ValueSelector> {
     bool userIsResident = surveyModel.showResidentData;
 
     if (userIsResident) {
-      print('✅ [SURVEY] Usuario residente - Mostrando botón de envío');
       context.read<SurveyModel>().showSubmitBtn = true;
     }
 
@@ -446,7 +425,6 @@ class _ValueSelectorState extends State<ValueSelector> {
 
     context.read<SurveyModel>().setUserRecommend(userRecommend);
     context.read<SurveyModel>().showRatingSection = true;
-    print('✅ [SURVEY] Campo "recommend" seleccionado - Mostrando botón de envío');
     context.read<SurveyModel>().showSubmitBtn = true;
   }
 }

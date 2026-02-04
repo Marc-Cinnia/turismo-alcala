@@ -111,7 +111,7 @@ class _SurveyPreDetailState extends State<SurveyPreDetail> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
-            color: AppConstants.backArrowColor,
+            color: AppConstants.primary,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -172,7 +172,7 @@ class _SurveyPreDetailState extends State<SurveyPreDetail> {
                 );
               }
 
-              if (variableSurveyNameEn != null &&
+              if (variableSurveyNameEn.isNotEmpty &&
                   labels[index] == variableSurveyNameEn) {
                 if (variableSurvey != null) {
                   String url = variableSurvey!.linkEn;

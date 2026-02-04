@@ -105,34 +105,20 @@ class _SurveyState extends State<Survey> {
         ? AppConstants.surveyDescriptionEn
         : AppConstants.surveyDescription;
 
-    final subtitle = Padding(
-      padding: const EdgeInsets.only(
-        top: AppConstants.spacing,
-        left: AppConstants.spacing,
-        right: AppConstants.spacing,
-      ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          descSubtitle,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(color: AppConstants.primary),
-        ),
+    final subtitle = Align(
+      alignment: Alignment.centerLeft,
+      child: Text(
+        descSubtitle,
+        style: Theme.of(context)
+            .textTheme
+            .titleMedium
+            ?.copyWith(color: AppConstants.primary),
       ),
     );
 
-    final descriptionSection = Padding(
-      padding: const EdgeInsets.only(
-        top: AppConstants.spacing,
-        left: AppConstants.spacing,
-        right: AppConstants.spacing,
-      ),
-      child: Text(
-        description,
-        textAlign: TextAlign.justify,
-      ),
+    final descriptionSection = Text(
+      description,
+      textAlign: TextAlign.justify,
     );
 
     final generalName = (language.english)
@@ -528,17 +514,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        tourismOfferLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      tourismOfferLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveyTourismOfferKey,
                     ),
@@ -548,17 +529,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        tourismInformationLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      tourismInformationLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveyTourismInformationKey,
                     ),
@@ -568,17 +544,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        cleanlinessMaintenanceLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      cleanlinessMaintenanceLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveyCleanlinessMaintenanceKey,
                     ),
@@ -588,17 +559,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        commerceServiceLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      commerceServiceLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveyCommerceServiceKey,
                     ),
@@ -608,17 +574,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        transportAccessibilityLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      transportAccessibilityLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveyTransportAccessibilityKey,
                     ),
@@ -628,17 +589,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        safetyLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      safetyLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                       aspectKey: AppConstants.surveySafetyKey,
                     ),
@@ -648,17 +604,12 @@ class _SurveyState extends State<Survey> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        touristSignageLabel,
-                        softWrap: true,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                    Text(
+                      touristSignageLabel,
+                      softWrap: true,
+                      maxLines: 2,
                     ),
-                    const SizedBox(width: 8.0),
                     RatingSurveyStarsBar(
                         aspectKey: AppConstants.surveyTouristSignageKey),
                   ],
@@ -677,68 +628,63 @@ class _SurveyState extends State<Survey> {
         : AppConstants.restartSurvey;
 
     final submitButton = (surveyModel.showSubmitBtn)
-        ? Flexible(
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                print('🔘 [SURVEY] Botón de envío presionado');
-                bool ageProvided = surveyModel.userAgeRange.isNotEmpty;
-                bool genderProvided = surveyModel.userGender.isNotEmpty;
+        ? ElevatedButton.icon(
+            onPressed: () async {
+              bool ageProvided = surveyModel.userAgeRange.isNotEmpty;
+              bool genderProvided = surveyModel.userGender.isNotEmpty;
 
-                bool countryProvided = surveyModel.userCountry.isNotEmpty;
+              bool countryProvided = surveyModel.userCountry.isNotEmpty;
 
-                bool mainValuesProvided =
-                    ageProvided && genderProvided && countryProvided;
+              bool mainValuesProvided =
+                  ageProvided && genderProvided && countryProvided;
 
-                String message = '';
+              String message = '';
 
-                if (mainValuesProvided) {
-                  if (surveyModel.showRatingSection) {
-                    if (!surveyModel.ratingFieldsFilled()) {
-                      message = (language.english)
-                          ? AppConstants.surveyRatingMissingMsgEn
-                          : AppConstants.surveyRatingMissingMsg;
+              if (mainValuesProvided) {
+                if (surveyModel.showRatingSection) {
+                  if (!surveyModel.ratingFieldsFilled()) {
+                    message = (language.english)
+                        ? AppConstants.surveyRatingMissingMsgEn
+                        : AppConstants.surveyRatingMissingMsg;
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(message),
-                        ),
-                      );
-                    } else {
-                      _submitSurvey(context);
-                    }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                      ),
+                    );
                   } else {
                     _submitSurvey(context);
                   }
                 } else {
-                  message = (language.english)
-                      ? AppConstants.surveyIncompleteFieldsMsgEn
-                      : AppConstants.surveyIncompleteFieldsMsg;
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(message),
-                    ),
-                  );
+                  _submitSurvey(context);
                 }
-              },
-              icon: const Icon(
-                Icons.send_outlined,
+              } else {
+                message = (language.english)
+                    ? AppConstants.surveyIncompleteFieldsMsgEn
+                    : AppConstants.surveyIncompleteFieldsMsg;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(message),
+                  ),
+                );
+              }
+            },
+            icon: const Icon(
+              Icons.send_outlined,
+              color: Colors.white,
+            ),
+            label: Text(
+              sendSurveyLabel,
+              style: GoogleFonts.dmSans().copyWith(
                 color: Colors.white,
+                fontSize: 15.0,
+                fontWeight: FontWeight.w500,
               ),
-              label: Text(
-                sendSurveyLabel,
-                style: GoogleFonts.dmSans().copyWith(
-                  color: Colors.white,
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.w500,
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(
-                  AppConstants.contrast,
-                ),
+            ),
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(
+                AppConstants.contrast,
               ),
             ),
           )
@@ -746,7 +692,6 @@ class _SurveyState extends State<Survey> {
 
     final surveyActions = OverflowBar(
       alignment: MainAxisAlignment.end,
-      spacing: 8.0,
       children: [
         TextButton(
             onPressed: () {
@@ -802,6 +747,7 @@ class _SurveyState extends State<Survey> {
               );
             },
             child: Text(restartSurveyLabel)),
+        vSpacer,
         submitButton,
       ],
     );
@@ -919,138 +865,76 @@ class _SurveyState extends State<Survey> {
         ),
         actions: ContentBuilder.getActions(),
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: EdgeInsets.only(
-            left: AppConstants.spacing,
-            right: AppConstants.spacing,
-            top: AppConstants.spacing,
-            bottom: AppConstants.contentBottomSpacing,
+      body: Center(
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: AppConstants.shortSpacing,
+              right: AppConstants.shortSpacing,
+              bottom: AppConstants.contentBottomSpacing + 20.0,
+            ),
+            child: mainContent,
           ),
-          child: mainContent,
         ),
       ),
     );
   }
 
   void _submitSurvey(BuildContext context) async {
-    print('🔄 [SURVEY] Iniciando envío de encuesta...');
+    final resultMsg = await context.read<SurveyModel>().submitSurvey();
 
-    // Mostrar diálogo de carga (sin texto para evitar que se quede "Enviando...")
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      useRootNavigator: true,
-      builder: (dialogContext) {
-        return const PopScope(
-          canPop: false,
-          child: AlertDialog(
-            content: SizedBox(
-              height: 56,
-              child: Center(child: CircularProgressIndicator()),
+    if (resultMsg != null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          final titleText = (language.english)
+              ? AppConstants.surveyTitleDialogEn
+              : AppConstants.surveyTitleDialog;
+          final descriptionText = (language.english)
+              ? AppConstants.surveyDescriptionDialogEn
+              : AppConstants.surveyDescriptionDialog;
+
+          return AlertDialog(
+            title: Text(titleText),
+            content: Text(
+              descriptionText,
+              textAlign: TextAlign.justify,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppConstants.primary,
+                  ),
             ),
-          ),
-        );
-      },
-    );
-
-    try {
-      final resultMsg = await context.read<SurveyModel>().submitSurvey();
-      print('🔄 [SURVEY] Resultado: $resultMsg');
-
-      // Cerrar diálogo de carga
-      if (context.mounted) {
-        final nav = Navigator.of(context, rootNavigator: true);
-        if (nav.canPop()) nav.pop();
-      }
-
-      if (resultMsg != null) {
-        print('✅ [SURVEY] Mostrando diálogo de éxito');
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) {
-            final titleText = (language.english)
-                ? AppConstants.surveyTitleDialogEn
-                : AppConstants.surveyTitleDialog;
-            final descriptionText = (language.english)
-                ? AppConstants.surveyDescriptionDialogEn
-                : AppConstants.surveyDescriptionDialog;
-
-            return AlertDialog(
-              title: Text(titleText),
-              content: Text(
-                descriptionText,
-                textAlign: TextAlign.justify,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppConstants.primary,
-                    ),
-              ),
-              actions: [
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    await context.read<SurveyModel>().setSurveyAnswered(true);
-                    Navigator.of(context).pop();
-                  },
-                  icon: const Icon(
-                    Icons.check,
+            actions: [
+              ElevatedButton.icon(
+                onPressed: () async {
+                  await context.read<SurveyModel>().setSurveyAnswered(true);
+                  Navigator.of(context).pop();
+                },
+                icon: const Icon(
+                  Icons.check,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  (language.english)
+                      ? AppConstants.acceptEn
+                      : AppConstants.accept,
+                  style: GoogleFonts.dmSans().copyWith(
                     color: Colors.white,
-                  ),
-                  label: Text(
-                    (language.english)
-                        ? AppConstants.acceptEn
-                        : AppConstants.accept,
-                    style: GoogleFonts.dmSans().copyWith(
-                      color: Colors.white,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all<Color>(
-                      AppConstants.contrast,
-                    ),
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            );
-          },
-        ).then((_) => Navigator.of(context).popUntil((route) => route.isFirst));
-      } else {
-        print('❌ [SURVEY] No se recibió respuesta del servidor');
-        // Mostrar mensaje de error si no hay resultado
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              (language.english)
-                  ? 'Error submitting survey. Please try again.'
-                  : 'Error al enviar la encuesta. Por favor, inténtalo de nuevo.',
-            ),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 4),
-          ),
-        );
-      }
-    } catch (e) {
-      print('❌ [SURVEY] Excepción en _submitSurvey: $e');
-      // Cerrar diálogo de carga si aún está abierto
-      if (context.mounted) {
-        final nav = Navigator.of(context, rootNavigator: true);
-        if (nav.canPop()) nav.pop();
-      }
-      // Mostrar mensaje de error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            (language.english)
-                ? 'Error submitting survey. Please check your connection and try again.'
-                : 'Error al enviar la encuesta. Por favor, verifica tu conexión e inténtalo de nuevo.',
-          ),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-        ),
-      );
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all<Color>(
+                    AppConstants.contrast,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ).then((_) => Navigator.of(context).popUntil((route) => route.isFirst));
     }
   }
 }
