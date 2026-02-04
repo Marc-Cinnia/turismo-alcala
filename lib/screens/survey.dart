@@ -936,27 +936,19 @@ class _SurveyState extends State<Survey> {
 
   void _submitSurvey(BuildContext context) async {
     print('🔄 [SURVEY] Iniciando envío de encuesta...');
-    
-    // Mostrar diálogo de carga
+
+    // Mostrar diálogo de carga (sin texto para evitar que se quede "Enviando...")
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) {
-        return PopScope(
+      useRootNavigator: true,
+      builder: (dialogContext) {
+        return const PopScope(
           canPop: false,
           child: AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
-                Text(
-                  (language.english)
-                      ? 'Sending survey...'
-                      : 'Enviando encuesta...',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
+            content: SizedBox(
+              height: 56,
+              child: Center(child: CircularProgressIndicator()),
             ),
           ),
         );
@@ -968,8 +960,9 @@ class _SurveyState extends State<Survey> {
       print('🔄 [SURVEY] Resultado: $resultMsg');
 
       // Cerrar diálogo de carga
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
+      if (context.mounted) {
+        final nav = Navigator.of(context, rootNavigator: true);
+        if (nav.canPop()) nav.pop();
       }
 
       if (resultMsg != null) {
@@ -1042,8 +1035,9 @@ class _SurveyState extends State<Survey> {
     } catch (e) {
       print('❌ [SURVEY] Excepción en _submitSurvey: $e');
       // Cerrar diálogo de carga si aún está abierto
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
+      if (context.mounted) {
+        final nav = Navigator.of(context, rootNavigator: true);
+        if (nav.canPop()) nav.pop();
       }
       // Mostrar mensaje de error
       ScaffoldMessenger.of(context).showSnackBar(

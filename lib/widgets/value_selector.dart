@@ -26,7 +26,9 @@ class ValueSelector extends StatefulWidget {
 
 class _ValueSelectorState extends State<ValueSelector> {
   final fontWeight = FontWeight.w300;
-  final FocusNode _focusNode = FocusNode();
+  // Evita que el DropdownMenu (que usa internamente un TextField) pida foco y
+  // muestre el teclado: en encuestas no se puede escribir.
+  final FocusNode _focusNode = FocusNode(canRequestFocus: false);
 
   late List<DropdownMenuEntry> entries;
   late TextStyle labelStyle;
@@ -99,6 +101,9 @@ class _ValueSelectorState extends State<ValueSelector> {
         enabled: widget.enabled,
         controller: widget.controller,
         focusNode: _focusNode,
+        requestFocusOnTap: false,
+        enableSearch: false,
+        enableFilter: false,
         dropdownMenuEntries: entries,
         hintText: hintText,
         inputDecorationTheme: InputDecorationTheme(
@@ -136,6 +141,7 @@ class _ValueSelectorState extends State<ValueSelector> {
             widget.controller.text = selection.valueDescription;
             // Perder el foco para cerrar el menú
             _focusNode.unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
             // Pequeño delay para asegurar que el menú se cierre antes de actualizar el estado
             Future.microtask(() {
               _handleSurveySelection(selection);
